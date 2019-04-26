@@ -1,0 +1,25 @@
+{
+  "name": "param-to-string",
+  "version": "1.0.0",
+  "description": "Generates a unique string from a parameter",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Kequc/param-to-string.git"
+  },
+  "keywords": [
+    "hash",
+    "stringify",
+    "array",
+    "object"
+  ],
+  "author": "Nathan Lunde-Berry",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kequc/param-to-string/issues"
+  },
+  "homepage": "https://github.com/Kequc/param-to-string#readme"
+}
