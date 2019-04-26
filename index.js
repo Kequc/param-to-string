@@ -10,11 +10,15 @@ const THINGS = {
         const arr = keys.map(key => key + ':' + paramToString(param[key]));
         return 'object:' + arr.length + ':' + arr.join('') + ';';
     },
-    date (param) { return 'date:' + param.getTime() + ';'; },
-    string (param) { return 'string:' + param.length + ':' + encodeURIComponent(param) + ';'; },
-    null () { return 'Null;'; },
-    undefined () { return 'Undefined;'; },
-    function (param) { return 'function:' + param.name + ':' + encodeURIComponent(param.toString()) + ';'; }
+    date (param) {
+        return 'date:' + param.getTime() + ';';
+    },
+    string (param) {
+        return 'string:' + param.length + ':' + stringify(param) + ';';
+    },
+    function (param) {
+        return 'function:' + param.name + ':' + stringify(param) + ';';
+    }
 };
 
 const ARRAY_TYPES = [
@@ -35,11 +39,12 @@ const ARRAY_TYPES = [
 function paramToString (param) {
     const kind = whatIsIt(param);
 
+    if (kind === 'object' && param.constructor.name !== 'Object') return param.constructor.name.toLowerCase() + ':' + THINGS.object(param);
     if (THINGS.hasOwnProperty(kind)) return THINGS[kind](param);
     if (ARRAY_TYPES.includes(kind)) return kind + ':' + THINGS.array(Array.from(param));
 
     try {
-        return kind + ':' + encodeURIComponent(param.toString()) + ';';
+        return kind + ':' + stringify(param) + ';';
     } catch (e) {
         return kind + ';';
     }
@@ -51,4 +56,8 @@ function whatIsIt (param) {
     const kind = /\[object (.*)\]/i.exec(Object.prototype.toString.call(param));
     if (!kind) return 'unknown';
     return kind[1].toLowerCase();
+}
+
+function stringify(param) {
+    return encodeURIComponent(param.toString());
 }

@@ -1,101 +1,76 @@
-# async-cacheify
+# param-to-string
 
-Wrapper for async functions.
+Generates a unique string from a parameter.
+
+## Warning
+
+I cannot say this library will not change. Please only use this for short term hashing purposes, or lock the version you are using of this library.
 
 ## Usage
 
-We can expect `expensiveFunction` is something we don't want to run very often. So we wrap it with this library, for the lifetime of the application it will only run the first time.
+Given a parameter in javascript if we wanted to hash it we would first need to convert it into a string, that's what this library aims to do. It will create a hashable string from just about anything.
 
 ```javascript
-const cacheify = require('async-cacheify');
+const paramToString = require('param-to-string');
 
-async function expensiveFunction () {
-    return await expensiveThing('x', 'y', 'z');
-}
-const cheapFunction = cacheify(expensiveFunction);
-
-const results = await Promise.all([
-    cheapFunction(),
-    cheapFunction(),
-    cheapFunction(),
-    cheapFunction(),
-    cheapFunction(),
-    cheapFunction(),
-    cheapFunction()
-]);
+paramToString('hello there');
+// string:11:hello%20there;
 ```
 
-We are able to run `cheapFunction` a lot for free.
-
-## Cache expiry
-
-It is possible to set a cache expiry so that the function will execute again, the example below uses a 1000 ms cooldown.
+We can create a string from arrays, objects and more.
 
 ```javascript
-const cacheify = require('async-cacheify');
+const paramToString = require('param-to-string');
 
-async function expensiveFunction () {
-    return await expensiveThing('x', 'y', 'z');
-}
-const cheapFunction = cacheify(expensiveFunction, 1000);
+paramToString([11, 21, 'hello there']);
+// array:3:number:11;number:21;string:11:hello%20there;;
 ```
 
-## Parallel function calls
+## Special cases
 
-By setting the cache expiry to `0` you will not have the benefit of a long running cache. However if the function is run more than once before the first invocation finishes they will still share the result without it running multiple times.
+### array
 
-```javascript
-const cacheify = require('async-cacheify');
+`'array:{param.length}:{paramToString(param[index])};{...etc};;'`
 
-async function expensiveFunction () {
-    return await expensiveThing('x', 'y', 'z');
-}
-const cheapFunction = cacheify(expensiveFunction, 0);
+### object
 
-const [result1, result2] = await Promise.all([cheapFunction(), cheapFunction()]);
-```
+Object keys are sorted alphabetically.
 
-## Cache breaking
+`'object:{keys.length}:{key}:{paramToString(param[key])};{...etc};;'`
 
-It is possible to force the function to run by passing `true` as the first argument, the example below breaks the cache twice. If there is already an invocation running that invocation takes precidence and will share the result.
+### date
 
-```javascript
-const cacheify = require('async-cacheify');
+`'date:{utc(param)};'`
 
-async function expensiveFunction () {
-    return await expensiveThing('x', 'y', 'z');
-}
-const cheapFunction = cacheify(expensiveFunction);
+### string
 
-const result1 = await cheapFunction();
-const result2 = await cheapFunction(true);
-const result3 = await cheapFunction();
-const result4 = await cheapFunction(true);
-```
+`'string:{param.length}:{escape(param)};'`
 
-## Errors
+### null
 
-Any error thrown throws for all, and then the cache is cleared. Therefore further invocations will keep trying to get it to work until there is a cache again.
+`'null;'`
 
-```javascript
-const cacheify = require('async-cacheify');
+### undefined
 
-async function expensiveFunction () {
-    throw new Error('Kabooooooom!');
-}
-const cheapFunction = cacheify(expensiveFunction);
+`'undefined;'`
 
-try {
-    await Promise.all([cheapFunction(), cheapFunction()]);
-} catch (e) {
-    console.log(e.message); // Kabooooooom!
-}
-try {
-    await cheapFunction();
-} catch (e) {
-    console.log(e.message); // Kabooooooom!
-}
-```
+### function
+
+`'function:{param.name}:{escape(stringify(param))};'`
+
+## Arrayable cases
+
+The following types are converted into an array prepended with their actual type. `['uint8array', 'uint8clampedarray', 'int8array', 'uint16array', 'int16array', 'uint32array', 'int32array', 'float32array', 'float64array', 'arraybuffer', 'map', 'set']` In the following format.
+
+`'type(param):array:{param.length}:{...etc};;'`
+
+## Nesting
+
+You can nest arrays and objects.
+
+## General case
+
+`'{type(param)}:{escape(stringify(param))};'`
 
 ## Contribute
 
