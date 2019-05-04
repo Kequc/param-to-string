@@ -16,11 +16,11 @@ it('returns a string', () => {
 });
 
 it('knows what an array is', () => {
-    assert.strict.equal(paramToString([11, 21]), 'array:2:number:11;number:21;;');
+    assert.strict.equal(paramToString([11, 21]), 'array:number:11;number:21;;');
 });
 
 it('knows what an object is', () => {
-    assert.strict.equal(paramToString({ foo: 11, bar: 21 }), 'object:2:bar:number:21;foo:number:11;;');
+    assert.strict.equal(paramToString({ foo: 11, bar: 21 }), 'object:bar:number:21;foo:number:11;;');
 });
 
 it('knows what a date is', () => {
@@ -28,7 +28,7 @@ it('knows what a date is', () => {
 });
 
 it('knows what a string is', () => {
-    assert.strict.equal(paramToString('hello there'), 'string:11:hello%20there;');
+    assert.strict.equal(paramToString('hello there'), 'string:hello%20there;');
 });
 
 it('knows what null is', () => {
@@ -47,24 +47,24 @@ it('knows what a map is', () => {
     const map = new Map();
     map.set('foo', 11);
     map.set('bar', 21);
-    assert.strict.equal(paramToString(map), 'map:array:2:array:2:string:3:foo;number:11;;array:2:string:3:bar;number:21;;;');
+    assert.strict.equal(paramToString(map), 'map:object:foo:number:11;bar:number:21;;');
 });
 
 it('knows what a set is', () => {
     const set = new Set();
     set.add(11);
     set.add(21);
-    assert.strict.equal(paramToString(set), 'set:array:2:number:11;number:21;;');
+    assert.strict.equal(paramToString(set), 'set:array:number:11;number:21;;');
 });
 
 it('knows what a arraybuffer is', () => {
     const arraybuffer = new ArrayBuffer();
-    assert.strict.equal(paramToString(arraybuffer), 'arraybuffer:array:0:;');
+    assert.strict.equal(paramToString(arraybuffer), 'arraybuffer:array:;');
 });
 
 it('knows what a int16array is', () => {
     const int16array = new Int16Array();
-    assert.strict.equal(paramToString(int16array), 'int16array:array:0:;');
+    assert.strict.equal(paramToString(int16array), 'int16array:array:;');
 });
 
 it('knows what a nested object is', () => {
@@ -75,12 +75,12 @@ it('knows what a nested object is', () => {
         },
         hello: 'there'
     };
-    assert.strict.equal(paramToString(object), 'object:2:hello:string:5:there;test:object:2:bar:number:21;foo:number:11;;;');
+    assert.strict.equal(paramToString(object), 'object:hello:string:there;test:object:bar:number:21;foo:number:11;;;');
 });
 
 it('knows what a nested array is', () => {
     const array = [[11, 21], 'there'];
-    assert.strict.equal(paramToString(array), 'array:2:array:2:number:11;number:21;;string:5:there;;');
+    assert.strict.equal(paramToString(array), 'array:array:number:11;number:21;;string:there;;');
 });
 
 it('knows what a instance is', () => {
@@ -88,7 +88,7 @@ it('knows what a instance is', () => {
         this.foo = 11;
         this.bar = 21;
     }
-    assert.strict.equal(paramToString(new MyVlog()), 'myvlog:object:2:bar:number:21;foo:number:11;;');
+    assert.strict.equal(paramToString(new MyVlog()), 'myvlog:object:bar:number:21;foo:number:11;;');
 });
 
 it('knows what a class instance is', () => {
@@ -98,5 +98,5 @@ it('knows what a class instance is', () => {
             this.bar = 21;
         }
     }
-    assert.strict.equal(paramToString(new MyVlog()), 'myvlog:object:2:bar:number:21;foo:number:11;;');
+    assert.strict.equal(paramToString(new MyVlog()), 'myvlog:object:bar:number:21;foo:number:11;;');
 });

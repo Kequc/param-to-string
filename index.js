@@ -1,26 +1,5 @@
 module.exports = paramToString;
 
-const THINGS = {
-    array (param) {
-        const arr = param.map(paramToString);
-        return 'array:' + arr.length + ':' + arr.join('') + ';';
-    },
-    object (param) {
-        const keys = Object.keys(param).sort((a, b) => a < b ? -1 : 1);
-        const arr = keys.map(key => key + ':' + paramToString(param[key]));
-        return 'object:' + arr.length + ':' + arr.join('') + ';';
-    },
-    date (param) {
-        return 'date:' + param.getTime() + ';';
-    },
-    string (param) {
-        return 'string:' + param.length + ':' + stringify(param) + ';';
-    },
-    function (param) {
-        return 'function:' + param.name + ':' + stringify(param) + ';';
-    }
-};
-
 const ARRAY_TYPES = [
     'uint8array',
     'uint8clampedarray',
@@ -32,22 +11,59 @@ const ARRAY_TYPES = [
     'float32array',
     'float64array',
     'arraybuffer',
+    'set',
+    'weakset'
+];
+
+const OBJECT_TYPES = [
     'map',
-    'set'
+    'weakmap'
 ];
 
 function paramToString (param) {
     const kind = whatIsIt(param);
 
-    if (kind === 'object' && param.constructor.name !== 'Object') return param.constructor.name.toLowerCase() + ':' + THINGS.object(param);
-    if (THINGS.hasOwnProperty(kind)) return THINGS[kind](param);
-    if (ARRAY_TYPES.includes(kind)) return kind + ':' + THINGS.array(Array.from(param));
+    switch (kind) {
+    case 'array': return renderArray(param) + ';';
+    case 'object': return renderObject(param, true) + ';';
+    case 'date': return 'date:' + param.getTime() + ';';
+    case 'function': return 'function:' + param.name + ':' + stringify(param) + ';';
+    }
+
+    if (ARRAY_TYPES.includes(kind)) return kind + ':' + renderArray(Array.from(param)) + ';';
+    if (OBJECT_TYPES.includes(kind)) return kind + ':' + renderObject(objectFrom(param)) + ';';
 
     try {
         return kind + ':' + stringify(param) + ';';
     } catch (e) {
         return kind + ';';
     }
+}
+
+function renderArray (param) {
+    const constructor = param.constructor.name.toLowerCase();
+    const values = param.map(paramToString);
+    const arr = ['array', values.join('')];
+    if (constructor !== 'array') arr.unshift(constructor);
+    return arr.join(':');
+}
+
+function renderObject (param, sortKeys = false) {
+    const constructor = param.constructor.name.toLowerCase();
+    const keys = Object.keys(param);
+    if (sortKeys) keys.sort((a, b) => a < b ? -1 : 1);
+    const values = keys.map(key => key + ':' + paramToString(param[key]));
+    const arr = ['object', values.join('')];
+    if (constructor !== 'object') arr.unshift(constructor);
+    return arr.join(':');
+}
+
+function objectFrom (param) {
+    const result = {};
+    for (const [key, value] of param.entries()) {
+        result[key] = value;
+    }
+    return result;
 }
 
 function whatIsIt (param) {

@@ -14,7 +14,7 @@ Given a parameter in javascript if we wanted to hash it we would first need to c
 const paramToString = require('param-to-string');
 
 paramToString('hello there');
-// string:11:hello%20there;
+// string:hello%20there;
 ```
 
 We can create a string from arrays, objects and more.
@@ -23,28 +23,24 @@ We can create a string from arrays, objects and more.
 const paramToString = require('param-to-string');
 
 paramToString([11, 21, 'hello there']);
-// array:3:number:11;number:21;string:11:hello%20there;;
+// array:number:11;number:21;string:hello%20there;;
 ```
 
 ## Special cases
 
 ### array
 
-`'array:{param.length}:{paramToString(param[index])};{...etc};;'`
+`'array:{paramToString(param[index])};{...etc};;'`
 
 ### object
 
 Object keys are sorted alphabetically.
 
-`'object:{keys.length}:{key}:{paramToString(param[key])};{...etc};;'`
+`'object:{key}:{paramToString(param[key])};{...etc};;'`
 
 ### date
 
 `'date:{utc(param)};'`
-
-### string
-
-`'string:{param.length}:{escape(param)};'`
 
 ### null
 
@@ -58,11 +54,17 @@ Object keys are sorted alphabetically.
 
 `'function:{param.name}:{escape(stringify(param))};'`
 
-## Arrayable cases
+## Array cases
 
-The following types are converted into an array prepended with their actual type. `['uint8array', 'uint8clampedarray', 'int8array', 'uint16array', 'int16array', 'uint32array', 'int32array', 'float32array', 'float64array', 'arraybuffer', 'map', 'set']` In the following format.
+The following types are converted into an array prepended with their actual type. `['uint8array', 'uint8clampedarray', 'int8array', 'uint16array', 'int16array', 'uint32array', 'int32array', 'float32array', 'float64array', 'arraybuffer', 'set', 'weakset']` In the following format.
 
-`'type(param):array:{param.length}:{...etc};;'`
+`'type(param):array:{...etc};;'`
+
+## Object cases
+
+The following types are converted into an object prepended with their actual type. `['map', 'weakmap']` In the following format.
+
+`'type(param):object:{...etc};;'`
 
 ## Nesting
 
