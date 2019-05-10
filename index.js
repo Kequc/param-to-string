@@ -25,7 +25,7 @@ function paramToString (param) {
 
     switch (kind) {
     case 'array': return renderArray(param) + ';';
-    case 'object': return renderObject(param, true) + ';';
+    case 'object': return renderObject(param) + ';';
     case 'date': return 'date:' + param.getTime() + ';';
     case 'function': return 'function:' + param.name + ':' + stringify(param) + ';';
     }
@@ -41,21 +41,18 @@ function paramToString (param) {
 }
 
 function renderArray (param) {
-    const constructor = param.constructor.name.toLowerCase();
-    const values = param.map(paramToString);
-    const arr = ['array', values.join('')];
-    if (constructor !== 'array') arr.unshift(constructor);
-    return arr.join(':');
+    return 'array:' + param.map(paramToString).join('');
 }
 
-function renderObject (param, sortKeys = false) {
-    const constructor = param.constructor.name.toLowerCase();
+function renderObject (param) {
     const keys = Object.keys(param);
-    if (sortKeys) keys.sort((a, b) => a < b ? -1 : 1);
-    const values = keys.map(key => key + ':' + paramToString(param[key]));
-    const arr = ['object', values.join('')];
-    if (constructor !== 'object') arr.unshift(constructor);
-    return arr.join(':');
+    keys.sort((a, b) => a < b ? -1 : 1);
+
+    const result = 'object:' + keys.map(key => key + ':' + paramToString(param[key])).join('');
+    const constructor = param.constructor.name.toLowerCase();
+
+    if (constructor !== 'object') return constructor + ':' + result;
+    return result;
 }
 
 function objectFrom (param) {

@@ -52,6 +52,8 @@ Object keys are sorted alphabetically.
 
 ### function
 
+Functions are rendered to strings.
+
 `'function:{param.name}:{escape(stringify(param))};'`
 
 ## Array cases
@@ -73,6 +75,10 @@ You can nest arrays and objects.
 ## General case
 
 `'{type(param)}:{escape(stringify(param))};'`
+
+## Considerations
+
+Object keys are sorted alphabetically. It doesn't matter what order parameters are inserted in the object, this is true for how `Map` and `Weakmap` are handled as well, insertion order is ignored. Functions are rendered to strings.
 
 ## Contribute
 

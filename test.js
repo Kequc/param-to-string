@@ -47,7 +47,7 @@ it('knows what a map is', () => {
     const map = new Map();
     map.set('foo', 11);
     map.set('bar', 21);
-    assert.strict.equal(paramToString(map), 'map:object:foo:number:11;bar:number:21;;');
+    assert.strict.equal(paramToString(map), 'map:object:bar:number:21;foo:number:11;;');
 });
 
 it('knows what a set is', () => {
